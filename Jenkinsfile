@@ -3,6 +3,9 @@ pipeline {
 
     environment {
         IMAGE_NAME = "hello-world-next"
+        VERCEL_TOKEN = credentials('VERCEL_TOKEN')
+        VERCEL_PROJECT = "hello-world-next"
+        VERCEL_ORG = "your-vercel-org-name"
     }
 
     stages {
@@ -20,11 +23,19 @@ pipeline {
             }
         }
 
-        stage('Run Container') {
+        stage('Test Docker Build') {
             steps {
                 script {
-                    bat "docker rm -f ${IMAGE_NAME} || exit 0"
-                    bat "docker run -d -p 3000:3000 --name ${IMAGE_NAME} ${IMAGE_NAME}"
+                    // Run container just to build/test, no ports exposed
+                    bat "docker run --rm --name ${IMAGE_NAME}-test ${IMAGE_NAME} npm run build"
+                }
+            }
+        }
+
+        stage('Deploy to Vercel') {
+            steps {
+                script {
+                    bat "vercel --prod --token ${VERCEL_TOKEN} --confirm"
                 }
             }
         }
