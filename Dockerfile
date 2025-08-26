@@ -9,18 +9,21 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
-# Build specifying the src folder
+# Build Next.js app inside src folder
 RUN npx next build src
 
 # Step 3: Production image
 FROM node:20-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV=production
-# Copy build output from src folder
-COPY --from=builder /app/src/public ./public
+
+# Copy public folder from root
+COPY --from=builder /app/public ./public
+# Copy .next folder from build output inside src
 COPY --from=builder /app/src/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+
 EXPOSE 3000
 # Start the app pointing to src folder
 CMD ["npx", "next", "start", "-p", "3000", "-d", "src"]
