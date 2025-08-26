@@ -6,6 +6,8 @@ pipeline {
         VERCEL_TOKEN = credentials('VERCEL_TOKEN')
         VERCEL_PROJECT = "hello-world-next"
         VERCEL_ORG = "your-vercel-org-name"
+        DOCKER_PATH = "\"C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe\""
+        VERCEL_PATH = "\"C:\\Users\\ADMIN\\AppData\\Roaming\\npm\\vercel.cmd\""
     }
 
     stages {
@@ -18,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    bat "docker build -t ${IMAGE_NAME} ."
+                    bat "${DOCKER_PATH} build -t ${IMAGE_NAME} ."
                 }
             }
         }
@@ -28,7 +30,7 @@ pipeline {
                 script {
                     echo 'Skipping test build; Docker image already contains built Next.js app'
                     // Optional: run container to test if it starts
-                    // bat "docker run --rm -d -p 3001:3000 --name ${IMAGE_NAME}-test ${IMAGE_NAME}"
+                    // bat "${DOCKER_PATH} run --rm -d -p 3001:3000 --name ${IMAGE_NAME}-test ${IMAGE_NAME}"
                 }
             }
         }
@@ -36,7 +38,7 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 script {
-                    bat "vercel --prod --token ${VERCEL_TOKEN} --confirm src"
+                    bat "${VERCEL_PATH} --prod --token ${VERCEL_TOKEN} --confirm src"
                 }
             }
         }
