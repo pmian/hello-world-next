@@ -38,7 +38,7 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 script {
-                    bat "${VERCEL_PATH} --prod --token ${VERCEL_TOKEN} --confirm src"
+                    bat "${VERCEL_PATH} --prod --token ${VERCEL_TOKEN} --yes"
                 }
             }
         }
